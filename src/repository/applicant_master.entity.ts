@@ -16,6 +16,9 @@ export class Applicant extends BaseEntity {
   middleName: string;
 
   @Column()
+  UDID : string;
+
+  @Column()
   lastName: string;
 
   @Column()
