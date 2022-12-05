@@ -51,6 +51,24 @@ export class Applicant extends BaseEntity {
   @Column()
   long: string;
 
+  @Column()
+  pName: string;
+
+  @Column()
+  pDOB: string;
+
+  @Column()
+  pAddress: string;
+
+  @Column()
+  pAge: number;
+
+  @Column()
+  pAddhar: string;
+
+  @Column()
+  pMobile: string;
+
   @Column({ default: true })
   isActive: boolean;
 
