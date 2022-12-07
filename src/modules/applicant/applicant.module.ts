@@ -4,9 +4,10 @@ import { ApplicantController } from './applicant.controller';
 import { Applicant } from 'src/repository/applicant_master.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Certificate } from 'src/repository/certificate.entity';
+import { ApplicantBiometric } from 'src/repository/applicant_biometric.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Applicant, Certificate])],
+  imports: [TypeOrmModule.forFeature([Applicant, Certificate, ApplicantBiometric])],
   providers: [ApplicantService],
   controllers: [ApplicantController]
 })

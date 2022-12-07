@@ -15,6 +15,7 @@ import { Certificate } from './repository/certificate.entity';
 import { Ward } from './repository/ward_master.entity';
 import { Zone } from './repository/zone_master.entity';
 import { ZoneWardModule } from './modules/zone-ward/zone-ward.module';
+import { ApplicantBiometric } from './repository/applicant_biometric.entity';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { ZoneWardModule } from './modules/zone-ward/zone-ward.module';
       username: 'root',
       password: 'prasad@123',
       database: 'db_pcmc_handicap_certificate',
-      entities: [User, Applicant, Certificate, Zone, Ward],
+      entities: [User, Applicant, Certificate, Zone, Ward, ApplicantBiometric],
       synchronize: true,
     }), LoginModule, ApplicantModule, ZoneWardModule
   ],

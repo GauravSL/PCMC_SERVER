@@ -1,8 +1,9 @@
-import { BaseEntity, Entity, Column,OneToMany,ManyToOne,JoinColumn, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Entity, Column,OneToMany,ManyToOne,JoinColumn,OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { HandicapType } from './applicant_type';
 import { Type } from 'class-transformer';
 import { Certificate } from './certificate.entity';
 import { Ward } from './ward_master.entity';
+import { ApplicantBiometric } from './applicant_biometric.entity';
 
 @Entity('tbl_applicant_master')
 export class Applicant extends BaseEntity {
@@ -81,4 +82,7 @@ export class Applicant extends BaseEntity {
   @ManyToOne(() => Ward, (ward) => ward.applicant, {eager: true})
   @JoinColumn()
   ward: Ward
+
+  @OneToOne(() => ApplicantBiometric, (applicantBiometric) => applicantBiometric.applicant)
+  applicantBiometric: ApplicantBiometric
 }
