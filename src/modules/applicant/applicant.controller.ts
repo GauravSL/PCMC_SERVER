@@ -3,6 +3,7 @@ import { ApplicantBiometric } from 'src/repository/applicant_biometric.entity';
 import { Applicant } from 'src/repository/applicant_master.entity';
 import { Certificate } from 'src/repository/certificate.entity';
 import { ApplicantService } from './applicant.service';
+import { BiometricReq } from './dto/biometric.req';
 
 @Controller('applicant')
 export class ApplicantController {
@@ -33,14 +34,14 @@ export class ApplicantController {
         return this.applicationService.findCertificate(addhar)
     }
 
-    @Get('/biometric/:applicantId')
-    getBiometric(@Param('applicantId')applicantId: number){
-        console.log(applicantId)
-        return this.applicationService.getBiometric(applicantId)
-    }
+    // @Get('/:applicantId/biometric/')
+    // getBiometric(@Param('applicantId')applicantId: number){
+    //     console.log(applicantId)
+    //     return this.applicationService.getBiometric(applicantId)
+    // }
     
-    @Post('/biometric')
-    insertFace(@Body() applicantBiometric: ApplicantBiometric){
-        return this.applicationService.insertFace(applicantBiometric)
+    @Post('/:applicantId/biometric')
+    insertFace(@Body() biometricReq: BiometricReq, @Param("applicantId") applicantId){
+        return this.applicationService.insertFace(applicantId, biometricReq)
     }
 }

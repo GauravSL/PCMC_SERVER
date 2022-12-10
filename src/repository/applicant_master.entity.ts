@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, Column,OneToMany,ManyToOne,JoinColumn,OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Entity, Column,OneToMany,ManyToOne,JoinTable,JoinColumn,OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { HandicapType } from './applicant_type';
 import { Type } from 'class-transformer';
 import { Certificate } from './certificate.entity';
@@ -83,6 +83,9 @@ export class Applicant extends BaseEntity {
   @JoinColumn()
   ward: Ward
 
-  @OneToOne(() => ApplicantBiometric, (applicantBiometric) => applicantBiometric.applicant)
+  @JoinTable()
+  @OneToOne((type) => ApplicantBiometric, (applicantBiometric) => applicantBiometric.applicant, {
+    cascade: true,
+  })
   applicantBiometric: ApplicantBiometric
 }
