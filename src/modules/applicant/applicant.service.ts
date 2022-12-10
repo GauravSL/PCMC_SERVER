@@ -104,7 +104,21 @@ export class ApplicantService {
           
       }
 
-    //   async getBiometric(applicantId: number){
-    //     return await this.applicantBiometricRepository.find({});
-    // }
+    async getBiometric(applicantId: number){
+      let applicant = await this.applicantRepository.findOneBy({applicantId})
+      //if applicant not present throw user not found error
+      if(applicant == null){
+        throw new HttpException('User not found', 400);
+      }
+      
+      let applicantBiometric = await this.applicantBiometricRepository.findOne(
+          {where: { applicant : {applicantId : (await applicant).applicantId}},
+      });
+
+      if(applicantBiometric != null){
+        return applicantBiometric;
+      }else{
+        throw new HttpException("No data found", 400)
+      }      
+    }
 }

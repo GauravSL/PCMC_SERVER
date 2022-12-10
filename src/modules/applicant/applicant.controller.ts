@@ -34,11 +34,10 @@ export class ApplicantController {
         return this.applicationService.findCertificate(addhar)
     }
 
-    // @Get('/:applicantId/biometric/')
-    // getBiometric(@Param('applicantId')applicantId: number){
-    //     console.log(applicantId)
-    //     return this.applicationService.getBiometric(applicantId)
-    // }
+    @Get('/:applicantId/biometric')
+    getBiometric(@Param('applicantId')applicantId: number){        
+        return this.applicationService.getBiometric(applicantId)
+    }
     
     @Post('/:applicantId/biometric')
     insertFace(@Body() biometricReq: BiometricReq, @Param("applicantId") applicantId){
