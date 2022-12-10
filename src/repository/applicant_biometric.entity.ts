@@ -6,13 +6,13 @@ export class ApplicantBiometric extends BaseEntity {
   @PrimaryGeneratedColumn()
   bioMetricId: number;
 
-  @Column()
+  @Column({ type: "varchar", length: 5000 })
   face: string;
 
-  @Column()
+  @Column({ type: "varchar", length: 5000 })
   fingerprint: string;
 
-  @Column()
+  @Column({ type: "varchar", length: 5000 })
   iris: string;
 
   @JoinColumn()
