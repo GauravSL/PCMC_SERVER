@@ -4,6 +4,7 @@ import { Applicant } from 'src/repository/applicant_master.entity';
 import { Certificate } from 'src/repository/certificate.entity';
 import { ApplicantService } from './applicant.service';
 import { BiometricReq } from './dto/biometric.req';
+import { CertificateReq } from './dto/certificate.req';
 
 @Controller('applicant')
 export class ApplicantController {
@@ -24,14 +25,14 @@ export class ApplicantController {
         return this.applicationService.findOne(addhar);
     }
 
-    @Post('/certificate')
-    submitCertificate(@Body() certificate: Certificate){
-        return this.applicationService.submitCertificate(certificate)
+    @Post('/:applicantId/certificate')
+    submitCertificate(@Body() certificateReq: CertificateReq, @Param("applicantId") applicantId){
+        return this.applicationService.submitCertificate(applicantId, certificateReq)
     }
 
-    @Get('/certificate/:aadhar')
-    findCertificate(@Param('aadhar')addhar: string){
-        return this.applicationService.findCertificate(addhar)
+    @Get('/:applicantId/certificate')
+    findCertificate(@Param("applicantId") applicantId){
+        return this.applicationService.findCertificate(applicantId)
     }
 
     @Get('/:applicantId/biometric')

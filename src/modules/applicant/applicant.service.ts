@@ -3,11 +3,14 @@ import  * as InjectRepo from '@nestjs/typeorm';
 import { ApplicantBiometric } from 'src/repository/applicant_biometric.entity';
 import { Applicant } from 'src/repository/applicant_master.entity';
 import { Certificate } from 'src/repository/certificate.entity';
+import { User } from 'src/repository/user.entity';
 import { Repository } from 'typeorm';
 import { BiometricReq } from './dto/biometric.req';
+import { CertificateReq } from './dto/certificate.req';
 @Injectable()
 export class ApplicantService {
     constructor(
+        @InjectRepo.InjectRepository(User) private userRepository: Repository<User>,  
         @InjectRepo.InjectRepository(Applicant) private applicantRepository: Repository<Applicant>,
         @InjectRepo.InjectRepository(Certificate) private certificateRepository: Repository<Certificate>,
         @InjectRepo.InjectRepository(ApplicantBiometric) private applicantBiometricRepository: Repository<ApplicantBiometric>,
@@ -27,11 +30,11 @@ export class ApplicantService {
             return await this.applicantRepository.save(applicant);
           }catch(err){
             console.log(err)
-            throw new HttpException('User already exist', 400);
+            throw new HttpException('Applicant already exist', 400);
           }     
           
         }else {
-            throw new HttpException('User already exist', 400);
+            throw new HttpException('Applicant already exist', 400);
         }
       }
   
@@ -45,17 +48,31 @@ export class ApplicantService {
             if(res != null){
               return res;                
             }else{
-              throw new HttpException('User not found', 400);
+              throw new HttpException('Applicant not found', 400);
             }
       }
 
       /**
        * Insert certificate data into database
-       * @param certificate Insert certificate
+       * @param certificateReq Insert certificate
+       * @param applicantId Applicant Id
        * @returns 
        */
-      async submitCertificate(certificate: Certificate) : Promise<Certificate> {
-          return await this.certificateRepository.save(certificate);        
+      async submitCertificate(applicantId: number, certificateReq: CertificateReq) : Promise<Certificate> {
+        let applicant = await this.applicantRepository.findOneBy({applicantId})
+        let user = await this.userRepository.findOne({where: {userId: certificateReq.userId}})
+        //if applicant not present throw user not found error
+        if(applicant == null || user == null){
+          throw new HttpException('User or Applicant not found', 400);
+        }else{
+          let certificate = new Certificate();
+          certificate.lat = certificateReq.lat;
+          certificate.long = certificateReq.long;
+          certificate.applicant = applicant;
+          certificate.createdBy = user;
+          certificate.year = certificateReq.year;      
+            return await this.certificateRepository.save(certificate);              
+        }    
       }
 
       /**
@@ -63,8 +80,19 @@ export class ApplicantService {
        * @param certificate Insert certificate
        * @returns 
        */
-       async findCertificate(applicantAadhar: string) : Promise<Certificate> {
-        return await this.certificateRepository.findOne({});        
+       async findCertificate(applicantId: number) : Promise<Certificate> {
+        let applicant = await this.applicantRepository.findOneBy({applicantId})
+        //if applicant not present throw user not found error
+        if(applicant == null){
+          throw new HttpException('Applicant not found', 400);
+        }else{
+          let certificate = await this.certificateRepository.findOne({where : {applicant: {applicantId: (await applicant).applicantId}}});  
+          if(certificate != null){
+            return certificate;
+          }else{
+            throw new HttpException("No data found", 400)
+          }    
+        }      
     }
   
       /**

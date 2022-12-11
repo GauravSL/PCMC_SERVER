@@ -8,7 +8,7 @@ export class Certificate {
   certificateId : number;
 
   @Column()
-  Year : string;
+  year : string;
 
   @CreateDateColumn()
   createdOn : string;
