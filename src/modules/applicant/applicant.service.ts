@@ -2,11 +2,13 @@ import { HttpException, Injectable } from '@nestjs/common';
 import  * as InjectRepo from '@nestjs/typeorm';
 import { ApplicantBiometric } from 'src/repository/applicant_biometric.entity';
 import { Applicant } from 'src/repository/applicant_master.entity';
+import { ApplicantDocument } from 'src/repository/application_document.entity';
 import { Certificate } from 'src/repository/certificate.entity';
 import { User } from 'src/repository/user.entity';
 import { Repository } from 'typeorm';
 import { BiometricReq } from './dto/biometric.req';
 import { CertificateReq } from './dto/certificate.req';
+import { DocumentReq } from './dto/document.req';
 @Injectable()
 export class ApplicantService {
     constructor(
@@ -14,6 +16,7 @@ export class ApplicantService {
         @InjectRepo.InjectRepository(Applicant) private applicantRepository: Repository<Applicant>,
         @InjectRepo.InjectRepository(Certificate) private certificateRepository: Repository<Certificate>,
         @InjectRepo.InjectRepository(ApplicantBiometric) private applicantBiometricRepository: Repository<ApplicantBiometric>,
+        @InjectRepo.InjectRepository(ApplicantDocument) private applicantDocumentRepository: Repository<ApplicantDocument>,
       ) {}
     
       /**
@@ -148,5 +151,86 @@ export class ApplicantService {
       }else{
         throw new HttpException("No data found", 400)
       }      
+    }
+
+    /**
+     * Get document on the basis of type
+     * @param applicantId 
+     * @param documentType 
+     */
+    async getApplicantDocumentByType(applicantId: number, documentType: string){
+      let applicant = await this.applicantRepository.findOneBy({applicantId})
+      //if applicant not present throw user not found error
+      if(applicant == null){
+        throw new HttpException('User not found', 400);
+      }
+      
+      let applicantDocument = await this.applicantDocumentRepository.findOne(
+          {where: { applicant : {applicantId : (await applicant).applicantId}},
+      });
+
+      if(applicantDocument != null){
+        if(documentType == "ADF"){
+          delete applicantDocument['photo'];
+          delete applicantDocument['uuid'];
+          delete applicantDocument['aadharBack'];
+        }else if(documentType == "ADB"){
+          delete applicantDocument['photo'];
+          delete applicantDocument['uuid'];
+          delete applicantDocument['aadharFront'];
+        }else if(documentType == "PH"){        
+          delete applicantDocument['uuid'];
+          delete applicantDocument['aadharFront'];
+          delete applicantDocument['aadharBack'];
+        }else if(documentType == "UUID"){        
+          delete applicantDocument['photo'];
+          delete applicantDocument['aadharFront'];
+          delete applicantDocument['aadharBack'];
+        }else if(documentType == "ADF-ADB"){        
+          delete applicantDocument['photo'];   
+          delete applicantDocument['uuid'];       
+        }
+        return applicantDocument;
+      }else{
+        throw new HttpException("No data found", 400)
+      }     
+    }
+
+    /**
+     * Upload documents
+     * @param applicantId 
+     * @param documentReq 
+     * @returns 
+     */
+    async insertApplicantDocumentByType(applicantId: number, documentReq: DocumentReq){
+  
+      let applicant = await this.applicantRepository.findOneBy({applicantId})
+          
+      //if applicant not present throw user not found error
+      if(applicant == null){
+        throw new HttpException('User not found', 400);
+      }
+
+      
+      let applicantDocument = await this.applicantDocumentRepository.findOne(
+        {where: { applicant : {applicantId : (await applicant).applicantId}},
+      });
+      if(applicantDocument == null){
+        applicantDocument = new ApplicantDocument();
+      }      
+      applicantDocument.photo = documentReq.photo ?? applicantDocument.photo ?? "";
+      applicantDocument.uuid = documentReq.uuid ?? applicantDocument.uuid ?? "";
+      applicantDocument.aadharFront = documentReq.aadharFront ?? applicantDocument.aadharFront ?? "";
+      applicantDocument.aadharBack = documentReq.aadharBack ?? applicantDocument.aadharBack ?? "";
+      applicantDocument.applicant = applicant;      
+      let response = await this.applicantDocumentRepository.save(applicantDocument);  
+      if(response != null){
+        return {
+          status: true,
+          message: "Uploaded successfully"
+        }
+      }else{
+        throw new HttpException("Error in upload ", 400);
+      }    
     }
 }

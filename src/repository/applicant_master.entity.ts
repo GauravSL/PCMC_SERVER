@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 import { Certificate } from './certificate.entity';
 import { Ward } from './ward_master.entity';
 import { ApplicantBiometric } from './applicant_biometric.entity';
+import { ApplicantDocument } from './application_document.entity';
 
 @Entity('tbl_applicant_master')
 export class Applicant extends BaseEntity {
@@ -88,4 +89,10 @@ export class Applicant extends BaseEntity {
     cascade: true,
   })
   applicantBiometric: ApplicantBiometric
+
+  @JoinTable()
+  @OneToOne((type) => ApplicantDocument, (applicantDocument) => applicantDocument.applicant, {
+    cascade: true
+  })
+  applicantDocument: ApplicantDocument
 }
